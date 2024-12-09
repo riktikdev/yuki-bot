@@ -64,6 +64,11 @@ class Yuki:
         video_file_path = None
 
         try:
+            video_info = await self._get_video_info(video_url)
+            if video_info['duration'] > 900:
+                await self._update_status_message("❌ **Видео больше 15 минут.**")
+                return
+
             video_file_path = await self._download_video(video_url)
             await self._update_status_message("⚙️ **Обработка видео...**")
             await self._update_status_message("📤 **Отправка видео...**")
@@ -82,6 +87,13 @@ class Yuki:
                     await self.current_status_message.delete()
                 except Exception:
                     pass
+
+    async def _get_video_info(self, video_url: str):
+        video_info = {}
+        with YoutubeDL(self.ydl_opts) as ydl:
+            info = ydl.extract_info(video_url, download=False)
+            video_info['duration'] = info.get('duration', 0)
+        return video_info
 
     async def _download_video(self, video_url: str) -> str:
         """
