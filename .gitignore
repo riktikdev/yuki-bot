@@ -1,0 +1,7 @@
+cache
+venv
+
+cookies.*
+
+*.env
+*.session*
